@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>4.4</version>
+    <date>2019-10-24T05:39:51Z</date>
+    <groups>
+        <group>
+            <name>Linux servers</name>
+        </group>
+        <group>
+            <name>Templates</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template App APT Updates</template>
+            <name>Template App APT Updates</name>
+            <groups>
+                <group>
+                    <name>Linux servers</name>
+                </group>
+                <group>
+                    <name>Templates</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>APT</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>Security Updates</name>
+                    <type>DEPENDENT</type>
+                    <key>apt.security</key>
+                    <delay>0</delay>
+                    <applications>
+                        <application>
+                            <name>APT</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>REGEX</type>
+                            <params>.*;(.*)
+\1</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>apt.update.stats</key>
+                    </master_item>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&gt;0</expression>
+                            <name>{ITEM.LASTVALUE} security updates on {HOST.NAME}</name>
+                            <priority>WARNING</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Raw apt update statistics</name>
+                    <type>ZABBIX_ACTIVE</type>
+                    <key>apt.update.stats</key>
+                    <history>7d</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <applications>
+                        <application>
+                            <name>APT</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Non-Critical Updates</name>
+                    <type>DEPENDENT</type>
+                    <key>apt.updates</key>
+                    <delay>0</delay>
+                    <applications>
+                        <application>
+                            <name>APT</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>REGEX</type>
+                            <params>(.*);.*
+\1</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>apt.update.stats</key>
+                    </master_item>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&gt;0</expression>
+                            <name>{ITEM.LASTVALUE} regular updates on {HOST.NAME}</name>
+                            <status>DISABLED</status>
+                            <priority>INFO</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+            </items>
+        </template>
+    </templates>
+</zabbix_export>
